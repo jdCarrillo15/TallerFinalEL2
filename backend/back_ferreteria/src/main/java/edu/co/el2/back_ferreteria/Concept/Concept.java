@@ -1,17 +1,17 @@
-package edu.co.el2.back_ferreteria.model;
+package edu.co.el2.back_ferreteria.Concept;
 
 public class Concept {
 
-    private short id;
+    private int id;
     private String nombre;
     private String obligatoriedad;
     private String tipo;
-    private String porcentaje;
+    private double porcentaje;
 
     public Concept() {
     }
 
-    public Concept(short id, String nombre, String obligatoriedad, String tipo, String porcentaje) {
+    public Concept(int id, String nombre, String obligatoriedad, String tipo, double porcentaje) {
         this.id = id;
         this.nombre = nombre;
         this.obligatoriedad = obligatoriedad;
@@ -19,11 +19,11 @@ public class Concept {
         this.porcentaje = porcentaje;
     }
 
-    public short getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(short id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -51,11 +51,11 @@ public class Concept {
         this.tipo = tipo;
     }
 
-    public String getPorcentaje() {
+    public double getPorcentaje() {
         return porcentaje;
     }
 
-    public void setPorcentaje(String porcentaje) {
+    public void setPorcentaje(double porcentaje) {
         this.porcentaje = porcentaje;
     }
 
