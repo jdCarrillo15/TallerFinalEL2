@@ -17,6 +17,7 @@ function App() {
       </nav>
 
       <Routes>
+
         <Route path="/conceptos" element={<Conceptos />} />
         <Route path="/marcas" element={<Marcas />} />
         <Route path="/proveedores" element={<Proveedores />} />
