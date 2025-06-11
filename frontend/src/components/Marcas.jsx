@@ -38,8 +38,14 @@ const Marcas = () => {
         ))}
       </ul>
       <h3>Agregar Marca</h3>
-      <input placeholder="ID" onChange={e => setNuevo({ ...nuevo, id_marca: e.target.value })} />
-      <input placeholder="Nombre" onChange={e => setNuevo({ ...nuevo, nombre_marca: e.target.value })} />
+      <input
+        placeholder="ID"
+        onChange={e => setNuevo({ ...nuevo, id_marca: e.target.value })}
+      />
+      <input
+        placeholder="Nombre"
+        onChange={e => setNuevo({ ...nuevo, nombre_marca: e.target.value })}
+      />
       <button onClick={postMarca}>Guardar</button>
     </div>
   );
