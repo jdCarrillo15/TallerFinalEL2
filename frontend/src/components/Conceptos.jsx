@@ -1,71 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 
 const Conceptos = () => {
   const [conceptos, setConceptos] = useState([]);
-  const [nuevo, setNuevo] = useState({ id: '', nombre: '', tipo: '', porcentaje: '' });
+  const [nuevoConcepto, setNuevoConcepto] = useState({ id: '', nombre: '', tipo: '', porcentaje: '' });
   const [busqueda, setBusqueda] = useState('');
+  const apiUrl = 'https://g1d3a15d23a19c4-tfjd.adb.us-phoenix-1.oraclecloudapps.com/ords/tfws/api/conceptos/';
 
-  const baseURL = 'https://g1d3a15d23a19c4-tfjd.adb.us-phoenix-1.oraclecloudapps.com/ords/tfws/api/conceptos/';
+  useEffect(() => {
+    obtenerConceptos();
+  }, []);
 
-  const getConceptos = async () => {
+  const obtenerConceptos = async () => {
     try {
-      const res = await axios.get(baseURL);
-      setConceptos(res.data.items || []);
-    } catch (err) {
-      console.error('Error al obtener conceptos:', err);
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      setConceptos(data.items || []);
+    } catch {
       alert('Error al obtener los conceptos');
     }
   };
 
-  const postConcepto = async () => {
+  const eliminarConcepto = async (id) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este concepto?')) return;
     try {
-      await axios.post(baseURL, nuevo);
-      setNuevo({ id: '', nombre: '', tipo: '', porcentaje: '' });
-      getConceptos();
-    } catch (err) {
-      console.error('Error al agregar concepto:', err);
-      alert('Error al agregar el concepto');
-    }
-  };
-
-  const deleteConcepto = async (id) => {
-    const confirmar = window.confirm('¿Estás seguro de que quieres eliminar este concepto?');
-    if (!confirmar) return;
-
-    try {
-      await axios.delete(baseURL + id);
-      getConceptos();
-    } catch (err) {
-      console.error('Error al eliminar concepto:', err);
+      const res = await fetch(apiUrl, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error();
+      alert('Concepto eliminado');
+      obtenerConceptos();
+    } catch {
       alert('Error al eliminar el concepto');
     }
   };
 
-  useEffect(() => {
-    getConceptos();
-  }, []);
+  const agregarConcepto = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoConcepto),
+      });
+      if (!res.ok) throw new Error();
+      alert('Concepto agregado');
+      setNuevoConcepto({ id: '', nombre: '', tipo: '', porcentaje: '' });
+      obtenerConceptos();
+    } catch {
+      alert('Error al agregar el concepto');
+    }
+  };
 
-  const filtrados = conceptos.filter(c => c.nombre?.toLowerCase().includes(busqueda.toLowerCase()));
+  const conceptosFiltrados = conceptos.filter(c =>
+    c.nombre?.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Conceptos</h2>
+    <div className="text-white px-4 py-6">
+      <h2 className="text-2xl font-bold mb-4">Lista de Conceptos</h2>
 
       <input
-        className="mb-4 p-2 border rounded w-full max-w-md"
+        type="text"
         placeholder="Buscar por nombre"
         value={busqueda}
-        onChange={e => setBusqueda(e.target.value)}
+        onChange={(e) => setBusqueda(e.target.value)}
+        className="mb-4 p-2 text-black rounded w-full max-w-sm"
       />
 
-      <ul className="mb-6 space-y-2">
-        {filtrados.map(c => (
-          <li key={c.id} className="flex items-center justify-between bg-gray-800 p-2 rounded">
-            <span>{c.nombre} - {c.tipo} - {c.porcentaje}%</span>
+      <ul className="mb-6">
+        {conceptosFiltrados.map(c => (
+          <li key={c.id} className="mb-2 flex items-center gap-4">
+            {c.nombre} - Tipo: {c.tipo} - {c.porcentaje ?? 'N/A'}%
             <button
-              className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-              onClick={() => deleteConcepto(c.id)}
+              onClick={() => eliminarConcepto(c.id)}
+              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
             >
               Eliminar
             </button>
@@ -73,39 +83,39 @@ const Conceptos = () => {
         ))}
       </ul>
 
-      <h3 className="text-xl font-semibold mb-2">Agregar Concepto</h3>
-      <div className="space-y-2 max-w-md">
+      <form onSubmit={agregarConcepto} className="space-y-4">
+        <h3 className="text-xl font-semibold">Añadir nuevo concepto</h3>
         <input
-          className="w-full p-2 border rounded"
           placeholder="ID"
-          value={nuevo.id}
-          onChange={e => setNuevo({ ...nuevo, id: e.target.value })}
+          value={nuevoConcepto.id}
+          onChange={e => setNuevoConcepto({ ...nuevoConcepto, id: e.target.value })}
+          className="p-2 text-black rounded w-full max-w-sm"
         />
         <input
-          className="w-full p-2 border rounded"
           placeholder="Nombre"
-          value={nuevo.nombre}
-          onChange={e => setNuevo({ ...nuevo, nombre: e.target.value })}
+          value={nuevoConcepto.nombre}
+          onChange={e => setNuevoConcepto({ ...nuevoConcepto, nombre: e.target.value })}
+          className="p-2 text-black rounded w-full max-w-sm"
         />
         <input
-          className="w-full p-2 border rounded"
           placeholder="Tipo"
-          value={nuevo.tipo}
-          onChange={e => setNuevo({ ...nuevo, tipo: e.target.value })}
+          value={nuevoConcepto.tipo}
+          onChange={e => setNuevoConcepto({ ...nuevoConcepto, tipo: e.target.value })}
+          className="p-2 text-black rounded w-full max-w-sm"
         />
         <input
-          className="w-full p-2 border rounded"
           placeholder="Porcentaje"
-          value={nuevo.porcentaje}
-          onChange={e => setNuevo({ ...nuevo, porcentaje: e.target.value })}
+          value={nuevoConcepto.porcentaje}
+          onChange={e => setNuevoConcepto({ ...nuevoConcepto, porcentaje: e.target.value })}
+          className="p-2 text-black rounded w-full max-w-sm"
         />
         <button
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={postConcepto}
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
         >
-          Guardar
+          Añadir Concepto
         </button>
-      </div>
+      </form>
     </div>
   );
 };
